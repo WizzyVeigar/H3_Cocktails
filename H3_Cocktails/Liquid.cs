@@ -23,12 +23,17 @@ namespace H3_Cocktails
         Tomato_Juice
     }
 
-    [Table("Liquid")]
+    //[Table("Liquid")]
     public class Liquid
     {
-        [Key]
+        public int LiquidId { get; set; }
         public LiquidType LiquidName { get; set; }
         public float AmountInml { get; set; }
+
+        public Liquid()
+        {
+
+        }
         public Liquid(LiquidType liquidName, float amountInml)
         {
             LiquidName = liquidName;

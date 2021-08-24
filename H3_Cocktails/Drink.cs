@@ -29,6 +29,11 @@ namespace H3_Cocktails
         [Key]
         public string Name { get; set; }
 
+        public Drink()
+        {
+            liquids = new List<Liquid>();
+        }
+
         public Drink(string name)
         {
             Name = name;
