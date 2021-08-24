@@ -23,13 +23,26 @@ namespace H3_Cocktails
             }
         }
 
-        public List<ViewDrink> GetAllDrinks()
+        public List<Drink> GetAllDrinks()
         {
             using (context = new DrinkContext())
             {
-                List<ViewDrink> drinks = (from drink in context.Set<Drink>()
-                                          select new ViewDrink { Name = drink.Name, Liquids = drink.Liquids }).ToList();
-                return drinks;
+                List<Drink> drinkList = new List<Drink>();
+                foreach (Drink drink in context.Drinks.Include(drink => drink.Liquids))
+                {
+                    drinkList.Add(drink);
+                }
+
+                foreach (AccessoryDrink accDrink in context.Drinks
+                    .Include(drink => drink.Liquids)
+                    .Include(drink => ((AccessoryDrink)drink).AccessoryDic))
+                {
+                    drinkList.Add(accDrink);
+                }
+                //List<ViewDrink> drinks = (from drink in context.Set<Drink>()
+                //                          select new ViewDrink { Name = drink.Name, Liquids = drink.Liquids }).ToList();
+                //List<Drink> drinks = context.set
+                return drinkList;
             }
         }
 
@@ -38,16 +51,15 @@ namespace H3_Cocktails
         /// </summary>
         /// <param name="name">The name of the liquid or drink</param>
         /// <returns></returns>
-        public List<ViewDrink> SearchForDrinks(string name)
+        public List<Drink> SearchForDrinks(string name)
         {
             using (context = new DrinkContext())
             {
-
-                return (from drink in context.Set<Drink>()
-                        from liquid in drink.Liquids
-                        where liquid.LiquidName.ToString().ToLower().Contains(name.ToLower()) || 
-                        drink.Name.ToLower().Contains(name.ToLower())
-                        select new ViewDrink { Name = drink.Name, Liquids = drink.Liquids }).ToList();
+                return (List<Drink>)(from drink in context.Drinks
+                                     from liquid in drink.Liquids
+                                     where liquid.LiquidName.ToString().ToLower().Contains(name.ToLower()) ||
+                                     drink.Name.ToLower().Contains(name.ToLower())
+                                     select drink);
             }
         }
 
@@ -85,8 +97,16 @@ namespace H3_Cocktails
                 {
                     Drink dbDrink = context.Drinks.Find(drink.Name);
 
+                    if (drink is AccessoryDrink)
+                    {
+                        AccessoryDrink accDrink = (AccessoryDrink)drink;
+                        for (int i = 0; i < accDrink.AccessoryDic.Count; i++)
+                        {
+                            ((AccessoryDrink)dbDrink).AccessoryDic.Add(accDrink.AccessoryDic.Keys.ElementAt(i),
+                                accDrink.AccessoryDic.Values.ElementAt(i));
+                        }
+                    }
                     dbDrink.Liquids.AddRange(drink.Liquids);
-                    dbDrink.Name = drink.Name;
                     context.SaveChanges();
                     return true;
                 }

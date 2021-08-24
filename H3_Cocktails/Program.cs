@@ -76,6 +76,47 @@ namespace H3_Cocktails
                 return;
             }
 
+            int secondInput = 0;
+            Console.WriteLine("Would you like to add a liquid or accessory?\n" +
+                "1. Liquid\n" +
+                "2. Accessory");
+            try
+            {
+                secondInput = int.Parse(Console.ReadLine());
+
+                if (secondInput == 1)
+                {
+                    AddNewLiquid(drink);
+                }
+                else if (secondInput == 2)
+                {
+                    AddNewAccessory(drink);
+                }
+            }
+            catch (Exception)
+            {
+                return;
+            }
+        }
+
+        private static void AddNewAccessory(Drink drink)
+        {
+            string accName = "";
+            string accDesc = "";
+
+            Console.Write("Name of the accessory: ");
+            accName = Console.ReadLine();
+            Console.WriteLine("Description of the accessory: ");
+            accDesc = Console.ReadLine();
+
+            ((AccessoryDrink)drink).AccessoryDic.Add(accName, accDesc);
+            if (drinkManager.UpdateDrink(drink))
+                Console.WriteLine("Success!");
+            else
+                Console.WriteLine("Failure!");
+        }
+        private static void AddNewLiquid(Drink drink)
+        {
             Console.WriteLine("What liquid would you like to add?\n");
             foreach (string liquid in Enum.GetNames(typeof(LiquidType)))
             {
@@ -112,7 +153,26 @@ namespace H3_Cocktails
 
             if (!string.IsNullOrEmpty(name))
             {
-                Drink drink = new Drink(name);
+                int accDrinkOrNormal = 0;
+                Console.WriteLine("Is it a normal drink or an accessory drink? 1 for yes, 2 for no");
+                try
+                {
+                    accDrinkOrNormal = int.Parse(Console.ReadLine());
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+
+                Drink drink = null;
+                if (accDrinkOrNormal == 1)
+                {
+                    drink = new AccessoryDrink(name);
+                }
+                else
+                {
+                    drink = new Drink(name);
+                }
 
                 if (drinkManager.CreateDrink(drink))
                     Console.WriteLine("Success");
@@ -130,7 +190,7 @@ namespace H3_Cocktails
             Console.WriteLine("What are you trying to search for?");
             string input = Console.ReadLine();
 
-            List<ViewDrink> drinks = drinkManager.SearchForDrinks(input);
+            List<Drink> drinks = drinkManager.SearchForDrinks(input);
             if (drinks.Count > 0)
             {
                 ShowDrinks(drinks);
@@ -154,18 +214,29 @@ namespace H3_Cocktails
 
         private static void GetAllDrinks()
         {
-            List<ViewDrink> drinks = drinkManager.GetAllDrinks();
+            List<Drink> drinks = drinkManager.GetAllDrinks();
             ShowDrinks(drinks);
         }
 
-        private static void ShowDrinks(List<ViewDrink> drinksToShow)
+        private static void ShowDrinks(List<Drink> drinksToShow)
         {
-            foreach (ViewDrink drink in drinksToShow)
+            foreach (Drink drink in drinksToShow)
             {
-                Console.WriteLine("\n"+drink.Name);
+                Console.WriteLine("\n" + drink.Name);
                 foreach (Liquid liquid in drink.Liquids)
                 {
                     Console.WriteLine("     " + liquid.LiquidName.ToString().Replace("_", " ") + ":" + liquid.AmountInml + " ml");
+                }
+
+                if (drink is AccessoryDrink)
+                {
+                    Console.WriteLine("   Accessories");
+                    AccessoryDrink accDrink = (AccessoryDrink)drink;
+
+                    foreach (KeyValuePair<string, string> kv in accDrink.AccessoryDic)
+                    {
+                        Console.WriteLine("     " + kv.Key + "      " + kv.Value);
+                    }
                 }
             }
         }
