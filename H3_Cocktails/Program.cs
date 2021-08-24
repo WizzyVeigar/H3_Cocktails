@@ -36,7 +36,7 @@ namespace H3_Cocktails
                         CreateDrinkMenu();
                         break;
                     case 2:
-                        SearchMenu();
+                        SearchDrinksMenu();
                         break;
                     case 3:
                         DeleteMenu();
@@ -76,7 +76,7 @@ namespace H3_Cocktails
                 return;
             }
 
-            int secondInput = 0;
+            int secondInput;
             Console.WriteLine("Would you like to add a liquid or accessory?\n" +
                 "1. Liquid\n" +
                 "2. Accessory");
@@ -101,8 +101,8 @@ namespace H3_Cocktails
 
         private static void AddNewAccessory(Drink drink)
         {
-            string accName = "";
-            string accDesc = "";
+            string accName;
+            string accDesc;
 
             Console.Write("Name of the accessory: ");
             accName = Console.ReadLine();
@@ -153,7 +153,7 @@ namespace H3_Cocktails
 
             if (!string.IsNullOrEmpty(name))
             {
-                int accDrinkOrNormal = 0;
+                int accDrinkOrNormal;
                 Console.WriteLine("Is it a normal drink or an accessory drink? 1 for yes, 2 for no");
                 try
                 {
@@ -164,7 +164,7 @@ namespace H3_Cocktails
                     throw;
                 }
 
-                Drink drink = null;
+                Drink drink;
                 if (accDrinkOrNormal == 1)
                 {
                     drink = new AccessoryDrink(name);
@@ -174,6 +174,7 @@ namespace H3_Cocktails
                     drink = new Drink(name);
                 }
 
+                //Doesn't actually have accessories anywhere in the db, for a reason I don't know.
                 if (drinkManager.CreateDrink(drink))
                     Console.WriteLine("Success");
                 else
@@ -185,7 +186,7 @@ namespace H3_Cocktails
             }
         }
 
-        private static void SearchMenu()
+        private static void SearchDrinksMenu()
         {
             Console.WriteLine("What are you trying to search for?");
             string input = Console.ReadLine();
@@ -225,9 +226,11 @@ namespace H3_Cocktails
                 Console.WriteLine("\n" + drink.Name);
                 foreach (Liquid liquid in drink.Liquids)
                 {
+                    //Formatting so it looks semi-pretty
                     Console.WriteLine("     " + liquid.LiquidName.ToString().Replace("_", " ") + ":" + liquid.AmountInml + " ml");
                 }
 
+                //No where to get the actual accessories
                 if (drink is AccessoryDrink)
                 {
                     Console.WriteLine("   Accessories");

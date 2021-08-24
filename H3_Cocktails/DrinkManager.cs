@@ -11,6 +11,7 @@ namespace H3_Cocktails
     class DrinkManager
     {
         private DrinkContext context;
+        
         public DrinkManager(DbContext context)
         {
             try
@@ -33,15 +34,14 @@ namespace H3_Cocktails
                     drinkList.Add(drink);
                 }
 
-                foreach (AccessoryDrink accDrink in context.Drinks
-                    .Include(drink => drink.Liquids)
-                    .Include(drink => ((AccessoryDrink)drink).AccessoryDic))
-                {
-                    drinkList.Add(accDrink);
-                }
-                //List<ViewDrink> drinks = (from drink in context.Set<Drink>()
-                //                          select new ViewDrink { Name = drink.Name, Liquids = drink.Liquids }).ToList();
-                //List<Drink> drinks = context.set
+                //part for adding accessoryDrinks, yet no path to AccessoryDic exists
+
+                //foreach (AccessoryDrink accDrink in context.Drinks
+                //    .Include(drink => drink.Liquids)
+                //    .Include(drink => ((AccessoryDrink)drink).AccessoryDic))
+                //{
+                //    drinkList.Add(accDrink);
+                //}
                 return drinkList;
             }
         }
@@ -97,9 +97,8 @@ namespace H3_Cocktails
                 {
                     Drink dbDrink = context.Drinks.Find(drink.Name);
 
-                    if (drink is AccessoryDrink)
+                    if (drink is AccessoryDrink accDrink)
                     {
-                        AccessoryDrink accDrink = (AccessoryDrink)drink;
                         for (int i = 0; i < accDrink.AccessoryDic.Count; i++)
                         {
                             ((AccessoryDrink)dbDrink).AccessoryDic.Add(accDrink.AccessoryDic.Keys.ElementAt(i),
@@ -112,6 +111,7 @@ namespace H3_Cocktails
                 }
                 catch (Exception e)
                 {
+                    Debug.WriteLine(e.Message);
                     return false;
                 }
             }
